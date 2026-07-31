@@ -132,8 +132,8 @@ async def logout(
     response.delete_cookie(
         key="prep_token",
         httponly=True,
-        # samesite="none",  # uncomment for deployment with secure=True
-        # secure=True,
+        samesite="none",  # uncomment for deployment with secure=True
+        secure=True,
     )
     return {"message": f"Logged out successfully. Goodbye, {current_user.name}!"}
 
