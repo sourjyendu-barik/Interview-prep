@@ -15,7 +15,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",     # local dev frontend
-        "https://yourfrontend.com",  # production frontend
+        "https://interview-preparation-tan.vercel.app",  # production frontend
     ],
     allow_credentials=True,
     allow_methods=["*"],
