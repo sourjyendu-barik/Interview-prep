@@ -2,57 +2,82 @@ def build_interview_prompt(
     job_role: str,
     years_experience: str | int,
     technical_keywords: list[str],
-    company_type: str | int,
+    company_type: str,
     focus_area: str | None = None,
 ) -> str:
     tech = ", ".join(technical_keywords)
-    exp = (
-        f"{years_experience} years"
-        if str(years_experience).strip()
-        else "Not specified"
-    )
-    focus = focus_area or "General"
+    exp = f"{years_experience}y"
+    focus = (focus_area or "").strip().lower()
 
-    return f"""Role: AI Job Interview Coach.
+    candidate = f"Role:{job_role}|Exp:{exp}|Skills:{tech}|Company:{company_type}"
 
-Task:
-Generate a realistic interview for the following candidate.
+    if focus == "coding":
+        instr = (
+            "Generate exactly 2 DSA coding interview questions. "
+            "Do not include answers or hints."
+        )
+        schema = """
+        {
+          "type": "coding",
+          "coding": ["question1", "question2"]
+        }
+        """
 
-Candidate:
-- Role: {job_role}
-- Experience: {exp}
-- Skills: {tech}
-- Company Type: {company_type}
-- Focus Area: {focus}
+    elif focus == "machine coding":
+        instr = (
+            "Generate exactly 1 machine coding round with title, duration, "
+            "and implementation requirements. Do not include a solution."
+        )
+        schema = """
+        {
+          "type": "machine_coding",
+          "machine_coding": {
+            "title": "",
+            "duration": "60 minutes",
+            "requirements": ["", "", ""]
+          }
+        }
+        """
 
-Instructions:
-1. Generate exactly 5 interview questions.
-2. Match the candidate's role, experience,Companytype, skills, and focus area.
-3. Generate one machine coding round with:
-   - title
-   - time
-   - task (exactly 3-4 implementation requirements)
-4. Generate one DSA coding question appropriate for the candidate's experience and company type.
-5. Do NOT provide answers, hints, or solutions.
-6. Return ONLY valid JSON.
+    elif focus == "concepts":
+        instr = (
+            "Generate 3-7 technical interview questions. "
+            "Do not include answers."
+        )
+        schema = """
+        {
+          "type": "concepts",
+          "questions": ["question1", "question2"]
+        }
+        """
 
-JSON Schema:
-{{
-  "questions": [
-    "",
-    "",
-    "",
-    "",
-    ""
-  ],
-  "mcr": {{
-    "title": "",
-    "time": "60 minutes",
-    "task": [
-      "",
-      "",
-      ""
-    ]
-  }},
-  "coding": ""
-}}""".strip()
+    elif focus == "hr":
+        instr = (
+            "Generate exactly 1 HR/behavioral interview question. "
+            "Do not include an answer."
+        )
+        schema = """
+        {
+          "type": "hr",
+          "question": ""
+        }
+        """
+
+    else:
+        # Fallback for any unrecognized focus area
+        instr = (
+            "Generate 3-5 technical interview questions. "
+            "Do not include answers."
+        )
+        schema = """
+        {
+          "type": "concepts",
+          "questions": ["question1", "question2"]
+        }
+        """
+
+    return (
+        f"AI Interview Coach. Candidate: {candidate}. Focus: {focus}.\n"
+        f"{instr}\n"
+        f"Return ONLY valid JSON, schema: {schema}"
+    ).strip()

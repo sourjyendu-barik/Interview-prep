@@ -22,7 +22,6 @@ async def fetchLlm(prompt: str):
     try:
         logger.info("Sending request to Gemini...")
         response = await client.aio.models.generate_content(  # type: ignore
-
         model="gemini-3.5-flash",
         contents=prompt,
         config=types.GenerateContentConfig(
